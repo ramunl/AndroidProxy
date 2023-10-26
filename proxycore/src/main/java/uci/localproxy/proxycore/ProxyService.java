@@ -1,5 +1,7 @@
 package uci.localproxy.proxycore;
 
+import static com.stericson.roottools.RootShell.getShell;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,13 +10,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import com.bitbucket.lonelydeveloper97.wifiproxysettingslibrary.proxy_change_realisation.wifi_network.WifiProxyChanger;
-import com.bitbucket.lonelydeveloper97.wifiproxysettingslibrary.proxy_change_realisation.wifi_network.exceptions.ApiNotSupportedException;
-import com.bitbucket.lonelydeveloper97.wifiproxysettingslibrary.proxy_change_realisation.wifi_network.exceptions.NullWifiConfigurationException;
-import com.stericson.RootShell.exceptions.RootDeniedException;
-import com.stericson.RootShell.execution.Command;
-import com.stericson.RootShell.execution.Shell;
-import com.stericson.RootTools.RootTools;
+import com.stericson.roottools.exceptions.RootDeniedException;
+import com.stericson.roottools.execution.Command;
+import com.stericson.roottools.execution.Shell;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -71,12 +69,12 @@ public class ProxyService extends Service {
             proxyThread.halt();
             if (set_global_proxy) {
                 //Toast.makeText(this, getString(R.string.OnNoProxy), Toast.LENGTH_LONG).show();
-                try {
+               /* try {
                     WifiProxyChanger.clearProxySettings(this);
                 } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException |
                         NoSuchFieldException | IllegalAccessException | NullWifiConfigurationException | ApiNotSupportedException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }
 
@@ -112,7 +110,7 @@ public class ProxyService extends Service {
             notifyit();
 
             //configuring wifi settings
-            try {
+            /*try {
                 if (set_global_proxy) {
                   //  Toast.makeText(this, getString(R.string.OnProxy), Toast.LENGTH_LONG).show();
                     WifiProxyChanger.changeWifiStaticProxySettings("127.0.0.1", outputport, this);
@@ -120,7 +118,7 @@ public class ProxyService extends Service {
             } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException |
                     NoSuchFieldException | IllegalAccessException | NullWifiConfigurationException | ApiNotSupportedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,7 +145,7 @@ public class ProxyService extends Service {
         Notification.Builder builder = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ?
                 new Notification.Builder(this, CHANNEL_ONE_ID) : new Notification.Builder(this);
 
-        builder.setContentTitle(getApplicationContext().getString(R.string.app_name))
+        builder.setContentTitle("proxy is set")
                // .setSmallIcon(R.mipmap.ic_launcher5)
                // .setContentText(getApplicationContext().getString(R.string.excuting_proxy_service_notification) + " " + user)
                 .setWhen(System.currentTimeMillis());
@@ -205,7 +203,7 @@ public class ProxyService extends Service {
             Command command = new Command(0, redirectRule);
             Command command1 = new Command(1, redirectRule2);
             Command command2 = new Command(1, redirectRule3);
-            Shell shell = RootTools.getShell(true);
+            Shell shell = getShell(true);
             shell.add(command0);
             shell.add(command);
             shell.add(command1);
