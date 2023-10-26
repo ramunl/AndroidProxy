@@ -6,11 +6,11 @@ import androidx.annotation.Nullable;
 
 import com.google.common.base.Strings;
 
-import uci.localproxy.data.applicationPackage.ApplicationPackage;
-import uci.localproxy.data.applicationPackage.ApplicationPackageLocalDataSource;
-import uci.localproxy.data.firewallRule.FirewallRule;
-import uci.localproxy.data.firewallRule.FirewallRuleDataSource;
-import uci.localproxy.data.firewallRule.FirewallRuleLocalDataSource;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackage;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

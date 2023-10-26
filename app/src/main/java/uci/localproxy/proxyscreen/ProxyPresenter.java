@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.util.Log;
 
 import com.google.common.base.Strings;
 
@@ -26,16 +25,16 @@ import cz.msebera.android.httpclient.impl.client.BasicCredentialsProvider;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import uci.localproxy.LocalProxyApplication;
-import uci.localproxy.data.firewallRule.FirewallRuleLocalDataSource;
-import uci.localproxy.data.pref.AppPreferencesHelper;
-import uci.localproxy.data.profile.Profile;
-import uci.localproxy.data.profile.source.ProfilesDataSource;
-import uci.localproxy.data.profile.source.ProfilesLocalDataSource;
-import uci.localproxy.data.user.User;
-import uci.localproxy.data.user.UsersDataSource;
-import uci.localproxy.data.user.UsersLocalDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource;
+import uci.localproxy.proxydata.pref.AppPreferencesHelper;
+import uci.localproxy.proxydata.profile.Profile;
+import uci.localproxy.proxydata.profile.source.ProfilesDataSource;
+import uci.localproxy.proxydata.profile.source.ProfilesLocalDataSource;
+import uci.localproxy.proxydata.user.User;
+import uci.localproxy.proxydata.user.UsersDataSource;
+import uci.localproxy.proxydata.user.UsersLocalDataSource;
 import uci.localproxy.proxycore.ProxyService;
-import uci.localproxy.util.network.PortsUtils;
+import uci.localproxy.proxyutil.network.PortsUtils;
 
 import static uci.localproxy.profilescreens.addeditprofile.AddEditProfilePresenter.MAX_PORTS_LIMIT;
 import static uci.localproxy.profilescreens.addeditprofile.AddEditProfilePresenter.MAX_SYSTEM_PORTS_LIMIT;

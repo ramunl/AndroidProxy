@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uci.localproxy.R;
-import uci.localproxy.data.applicationPackage.ApplicationPackage;
-import uci.localproxy.data.applicationPackage.ApplicationPackageLocalDataSource;
-import uci.localproxy.data.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackage;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
 import uci.localproxy.firewallscreens.addeditfirewallrule.AddEditFirewallRuleActivity;
 import uci.localproxy.firewallscreens.firewallruledetails.FirewallRuleDetailsActivity;
 import uci.localproxy.firewallscreens.firewallruledetails.FirewallRuleDetailsFragment;

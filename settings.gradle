@@ -1,1 +1,4 @@
 include ':app', ':RootTools', ':RootShell', ':ProxySettingsChange'
+include ':proxycore'
+include ':proxydata'
+include ':proxyutil'

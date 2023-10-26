@@ -9,7 +9,7 @@ import androidx.appcompat.widget.Toolbar;
 
 
 import uci.localproxy.R;
-import uci.localproxy.data.applicationPackage.ApplicationPackageLocalDataSource;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource;
 import uci.localproxy.util.ActivityUtils;
 
 /**

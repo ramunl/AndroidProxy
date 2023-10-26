@@ -4,10 +4,10 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-import uci.localproxy.data.firewallRule.FirewallRule;
-import uci.localproxy.data.firewallRule.FirewallRuleLocalDataSource;
-import uci.localproxy.data.trace.Trace;
-import uci.localproxy.data.trace.TraceDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource;
+import uci.localproxy.proxydata.trace.Trace;
+import uci.localproxy.proxydata.trace.TraceDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

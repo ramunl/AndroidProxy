@@ -7,9 +7,9 @@ import com.google.common.base.Strings;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 
-import uci.localproxy.data.profile.Profile;
-import uci.localproxy.data.profile.source.ProfilesDataSource;
-import uci.localproxy.data.profile.source.ProfilesLocalDataSource;
+import uci.localproxy.proxydata.profile.Profile;
+import uci.localproxy.proxydata.profile.source.ProfilesDataSource;
+import uci.localproxy.proxydata.profile.source.ProfilesLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

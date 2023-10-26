@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 
 import uci.localproxy.R;
-import uci.localproxy.data.trace.Trace;
+import uci.localproxy.proxydata.trace.Trace;
 
 /**
  * Created by daniel on 16/02/18.

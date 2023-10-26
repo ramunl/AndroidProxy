@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uci.localproxy.R;
-import uci.localproxy.data.profile.Profile;
+import uci.localproxy.proxydata.profile.Profile;
 import uci.localproxy.profilescreens.addeditprofile.AddEditProfileActivity;
 import uci.localproxy.profilescreens.profiledetails.ProfileDetailsActivity;
 

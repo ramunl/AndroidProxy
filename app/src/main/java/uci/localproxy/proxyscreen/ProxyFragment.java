@@ -38,8 +38,8 @@ import java.util.Locale;
 
 import uci.localproxy.R;
 import uci.localproxy.LocalProxyApplication;
-import uci.localproxy.data.profile.Profile;
-import uci.localproxy.data.user.User;
+import uci.localproxy.proxydata.profile.Profile;
+import uci.localproxy.proxydata.user.User;
 import uci.localproxy.profilescreens.addeditprofile.AddEditProfileActivity;
 import uci.localproxy.profilescreens.addeditprofile.AddEditProfilePresenter;
 import uci.localproxy.proxycore.ProxyService;

@@ -21,7 +21,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import uci.localproxy.BaseDrawerActivity;
 import uci.localproxy.R;
-import uci.localproxy.data.pref.AppPreferencesHelper;
+import uci.localproxy.proxydata.pref.AppPreferencesHelper;
 import uci.localproxy.proxycore.ProxyService;
 import uci.localproxy.util.ActivityUtils;
 

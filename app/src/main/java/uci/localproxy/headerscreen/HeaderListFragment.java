@@ -8,14 +8,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 
-
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import uci.localproxy.R;
-import uci.localproxy.data.header.Header;
+import uci.localproxy.proxydata.header.Header;
 
 import android.view.LayoutInflater;
 import android.view.View;

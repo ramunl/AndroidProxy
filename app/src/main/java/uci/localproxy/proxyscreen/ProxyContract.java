@@ -6,8 +6,8 @@ import java.util.List;
 
 import uci.localproxy.BasePresenter;
 import uci.localproxy.BaseView;
-import uci.localproxy.data.profile.Profile;
-import uci.localproxy.data.user.User;
+import uci.localproxy.proxydata.profile.Profile;
+import uci.localproxy.proxydata.user.User;
 
 /**
  * Created by daniel on 15/09/17.

@@ -5,9 +5,9 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-import uci.localproxy.data.firewallRule.FirewallRule;
-import uci.localproxy.data.firewallRule.FirewallRuleDataSource;
-import uci.localproxy.data.firewallRule.FirewallRuleLocalDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleDataSource;
+import uci.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource;
 import uci.localproxy.firewallscreens.addeditfirewallrule.AddEditFirewallRuleActivity;
 
 /**

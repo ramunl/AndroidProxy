@@ -4,7 +4,7 @@ import java.util.List;
 
 import uci.localproxy.BasePresenter;
 import uci.localproxy.BaseView;
-import uci.localproxy.data.applicationPackage.ApplicationPackage;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackage;
 
 /**
  * Created by daniel on 1/10/17.

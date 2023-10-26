@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uci.localproxy.R;
-import uci.localproxy.data.applicationPackage.ApplicationPackage;
-import uci.localproxy.data.applicationPackage.ApplicationPackageLocalDataSource;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackage;
+import uci.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource;
 
 /**
  * Created by daniel on 1/10/17.

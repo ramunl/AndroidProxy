@@ -6,7 +6,7 @@ import java.util.List;
 
 import uci.localproxy.BasePresenter;
 import uci.localproxy.BaseView;
-import uci.localproxy.data.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
 
 /**
  * Created by daniel on 29/09/17.

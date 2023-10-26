@@ -8,8 +8,8 @@ import java.util.List;
 
 import uci.localproxy.BasePresenter;
 import uci.localproxy.BaseView;
-import uci.localproxy.data.firewallRule.FirewallRule;
-import uci.localproxy.data.header.Header;
+import uci.localproxy.proxydata.firewallRule.FirewallRule;
+import uci.localproxy.proxydata.header.Header;
 
 /**
  * Created by daniel on 30/08/18.

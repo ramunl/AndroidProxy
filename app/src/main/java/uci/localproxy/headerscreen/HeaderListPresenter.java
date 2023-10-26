@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-import uci.localproxy.data.header.Header;
-import uci.localproxy.data.header.HeaderDataSource;
+import uci.localproxy.proxydata.header.Header;
+import uci.localproxy.proxydata.header.HeaderDataSource;
 
 /**
  * Created by daniel on 30/08/18.
