@@ -2,11 +2,13 @@ package uci.localproxy.util.fontAwesome;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
+import android.util.LruCache;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 
-public class TextAwesome extends android.support.v7.widget.AppCompatTextView {
+public class TextAwesome extends AppCompatTextView {
 
 	private final static String NAME = "FONTAWESOME";
 	private static LruCache<String, Typeface> sTypefaceCache = new LruCache<String, Typeface>(12);

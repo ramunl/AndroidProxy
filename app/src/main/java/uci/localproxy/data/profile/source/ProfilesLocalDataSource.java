@@ -1,6 +1,6 @@
 package uci.localproxy.data.profile.source;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.realm.Realm;
 import io.realm.RealmResults;

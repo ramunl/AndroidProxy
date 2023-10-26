@@ -2,6 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidProxy.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidProxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AndroidProxy.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.iml" filepath="$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.main.iml" filepath="$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/proxycore/AndroidProxy.proxycore.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/LocalProxy.iml" filepath="$PROJECT_DIR$/LocalProxy.iml" />
       <module fileurl="file://$PROJECT_DIR$/ProxySettingsChange/ProxySettingsChange.iml" filepath="$PROJECT_DIR$/ProxySettingsChange/ProxySettingsChange.iml" />
       <module fileurl="file://$PROJECT_DIR$/RootShell/RootShell.iml" filepath="$PROJECT_DIR$/RootShell/RootShell.iml" />

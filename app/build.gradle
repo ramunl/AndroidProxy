@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
+apply plugin: 'realm-android' // add this line
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.1'
+    namespace 'uci.localproxy'
+    compileSdk 33
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'uci.localproxy'
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName '1.1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -16,7 +17,6 @@ android {
         debug {
             minifyEnabled true
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -24,7 +24,6 @@ android {
         release {
             shrinkResources true
             minifyEnabled true
-            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'}
     }
@@ -45,32 +44,37 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
-
-    lintOptions{
+    lint {
         disable 'MissingTranslation'
     }
 
+
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile 'com.android.support:support-annotations:24.0.0'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'io.reactivex:rxjava:1.1.5'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'io.reactivex.rxjava3:rxjava:3.0.12'
+
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs'
     })
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:design:27.0.2'
-    compile 'com.google.guava:guava:20.0'
-    compile 'cz.msebera.android:httpclient:4.4.1.1'
-    compile 'org.jasypt:jasypt:1.9.2'
-    compile 'com.github.chrisbanes:PhotoView:2.1.3'
-    compile 'com.github.daniel-stoneuk:material-about-library:2.2.4'
+    implementation 'com.android.support:appcompat-v7:+'
+    implementation 'com.android.support:design:+'
+    implementation 'com.google.guava:guava:23.0'
+    implementation 'cz.msebera.android:httpclient:4.4.1.1'
+    implementation 'org.jasypt:jasypt:1.9.2'
+    implementation 'com.github.chrisbanes:PhotoView:2.1.3'
+    implementation 'com.github.daniel-stoneuk:material-about-library:3.1.2'
     implementation project(':RootTools')
     implementation project(':RootShell')
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    compile project(path: ':ProxySettingsChange')
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+    implementation project(path: ':ProxySettingsChange')
+    // https://mvnrepository.com/artifact/io.realm/realm-gradle-plugin
+    implementation("io.realm:realm-gradle-plugin:10.16.1")
+
 }

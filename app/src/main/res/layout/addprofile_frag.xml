@@ -13,7 +13,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nameEntry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -29,7 +29,7 @@
                 android:singleLine="true"
                 android:textSize="@dimen/text_size" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/ServerTextView"
@@ -39,7 +39,7 @@
             android:text="@string/Server"
             android:textSize="@dimen/text_size" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/serverEntry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -55,7 +55,7 @@
                 android:singleLine="true"
                 android:textSize="@dimen/text_size" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <TextView
@@ -65,7 +65,7 @@
             android:text="@string/InputPort"
             android:textSize="@dimen/text_size" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -81,7 +81,7 @@
                 android:singleLine="true"
                 android:textSize="@dimen/text_size" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/BypassTextView"
@@ -90,7 +90,7 @@
             android:text="@string/Bypass"
             android:textSize="@dimen/text_size" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -104,7 +104,7 @@
                 android:singleLine="true"
                 android:textSize="@dimen/text_size" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!--<TextView-->
             <!--android:id="@+id/domainTv"-->
@@ -113,7 +113,7 @@
             <!--android:text="@string/Domain"-->
             <!--android:textSize="@dimen/text_size" />-->
 
-        <!--<android.support.design.widget.TextInputLayout-->
+        <!--<com.google.android.material.textfield.TextInputLayout-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content">-->
 
@@ -127,7 +127,7 @@
                 <!--android:singleLine="true"-->
                 <!--android:textSize="@dimen/text_size" />-->
 
-        <!--</android.support.design.widget.TextInputLayout>-->
+        <!--</com.google.android.material.textfield.TextInputLayout>-->
 
     </LinearLayout>
 

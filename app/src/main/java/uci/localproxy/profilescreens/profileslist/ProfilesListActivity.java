@@ -1,12 +1,15 @@
 package uci.localproxy.profilescreens.profileslist;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+
+
 import android.view.MenuItem;
+
+import com.google.android.material.navigation.NavigationView;
 
 import uci.localproxy.BaseDrawerActivity;
 import uci.localproxy.R;

@@ -1,6 +1,6 @@
 package uci.localproxy.data.applicationPackage;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Created by daniel on 3/11/17.

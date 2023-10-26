@@ -1,6 +1,6 @@
 package uci.localproxy.data.trace;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.common.base.Strings;
 
@@ -35,12 +35,12 @@ public class TraceDataSource {
     }
 
     public void getAllTraces(LoadTracesCallback callback) {
-        List<Trace> traces = realm.where(Trace.class).findAllSorted(Trace.DATETIME_FIELD, Sort.DESCENDING);
+        /*List<Trace> traces = realm.where(Trace.class).findAllSorted(Trace.DATETIME_FIELD, Sort.DESCENDING);
         if (traces.isEmpty()) {
             callback.onDataNoAvailable();
         } else {
             callback.onTracesLoaded(traces);
-        }
+        }*/
     }
 
     public void filterTraces(String filter, boolean sortByConsumption, LoadTracesCallback callback) {
@@ -54,9 +54,9 @@ public class TraceDataSource {
         }
         List<Trace> traces;
         if (sortByConsumption)
-            traces = query.findAllSorted(Trace.BYTES_SPENT_FIELD, Sort.DESCENDING);
+            traces = query.findAll();
         else
-            traces = query.findAllSorted(Trace.DATETIME_FIELD, Sort.DESCENDING);
+            traces = query.findAll();
 
         if (traces.isEmpty())
             callback.onDataNoAvailable();
