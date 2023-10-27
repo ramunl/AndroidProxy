@@ -73,7 +73,7 @@ public class FirewallRuleLocalDataSource implements FirewallRuleDataSource {
             firewallRuleToUpdate.setRule(firewallRule.getRule());
             firewallRuleToUpdate.setDescription(firewallRule.getDescription());
             firewallRuleToUpdate.setApplicationPackageName(firewallRule.getApplicationPackageName());
-            firewallRuleToUpdate.setActive(firewallRuleToUpdate.isActive());
+            firewallRuleToUpdate.setActive(firewallRuleToUpdate.isActive);
             realm.commitTransaction();
         }
     }

@@ -35,7 +35,7 @@ public class FirewallRule extends RealmObject {
 
     private String description;
 
-    private boolean isActive;
+    public boolean isActive;
 
     public static FirewallRule newInstance(@NonNull String firewallRuleId, @NonNull String rule,
                                            @NonNull String applicationPackageName,
@@ -81,9 +81,6 @@ public class FirewallRule extends RealmObject {
         this.rule = rule;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
 
     public void setActive(boolean active) {
         isActive = active;

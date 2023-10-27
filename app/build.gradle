@@ -1,31 +1,35 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'kotlin-android'
 
 android {
     namespace 'uci.localproxy'
-    compileSdk 33
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
+        multiDexEnabled true
         applicationId 'uci.localproxy'
         minSdkVersion 24
         targetSdkVersion 33
         versionCode 1
         versionName '1.1'
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    dexOptions {
+        preDexLibraries false
     }
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
 
         release {
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'}
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+        }
     }
 
 
@@ -47,10 +51,16 @@ android {
     lint {
         disable 'MissingTranslation'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 
 
 }
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
+
     implementation project(':proxycore')
     implementation project(':proxydata')
     implementation project(':proxyutil')
@@ -58,17 +68,18 @@ dependencies {
     implementation 'com.google.guava:guava:23.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+
+    androidTestImplementation 'androidx.annotation:annotation:1.7.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'io.reactivex.rxjava3:rxjava:3.0.12'
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs'
     })
-    implementation 'com.android.support:appcompat-v7:+'
-    implementation 'com.android.support:design:+'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
 
 
     implementation 'com.github.chrisbanes:PhotoView:2.1.3'

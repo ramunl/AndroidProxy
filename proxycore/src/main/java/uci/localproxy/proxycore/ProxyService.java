@@ -1,7 +1,5 @@
 package uci.localproxy.proxycore;
 
-import static com.stericson.roottools.RootShell.getShell;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,17 +8,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import com.stericson.roottools.exceptions.RootDeniedException;
-import com.stericson.roottools.execution.Command;
-import com.stericson.roottools.execution.Shell;
-
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
 
 import uci.localproxy.proxycore.core.HttpForwarder;
 
@@ -179,6 +169,7 @@ public class ProxyService extends Service {
 
     //This from <SandroProxy proyect>/projects/SandroProxyPlugin/src/org/sandroproxy/plugin/gui/MainActivity.java
 //    private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProxyService.class.getName());
+    /*
     private void ipTablesForTransparentProxy(boolean activate) {
         int processId = getApplicationInfo().uid;
         String excludedUid = String.valueOf(processId);
@@ -281,4 +272,6 @@ public class ProxyService extends Service {
 ////            logger.finest("Error executing rules: " + e.getMessage());
 //        }
     }
+    */
 }
+
