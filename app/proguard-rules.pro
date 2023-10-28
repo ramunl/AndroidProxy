@@ -1,5 +1,5 @@
 # Some methods are only called from tests, so make sure the shrinker keeps them.
--keep class uci.localproxy.** { *; }
+-keep class grgr.localproxy.** { *; }
 
 -keep class androidx.drawerlayout.widget.DrawerLayout { *; }
 -keep class android.support.test.espresso.IdlingResource { *; }

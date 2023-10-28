@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
-            tools:text="127.0.0.1,localhost,*uci.cu" />
+            tools:text="127.0.0.1,localhost,*grgr.cu" />
 
     </LinearLayout>
 

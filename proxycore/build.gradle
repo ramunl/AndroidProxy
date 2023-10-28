@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'uci.localproxy.proxycore'
+    namespace 'grgr.localproxy.proxycore'
     compileSdk 34
 
     defaultConfig {

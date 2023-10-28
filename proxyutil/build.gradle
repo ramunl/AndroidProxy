@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'uci.localproxy.proxyutil'
+    namespace 'grgr.localproxy.proxyutil'
     compileSdk 34
 
     defaultConfig {

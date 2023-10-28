@@ -1,9 +1,5 @@
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.SmallTest;
-import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -16,9 +12,13 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
-import uci.localproxy.proxycore.core.HttpForwarder;
+import grgr.localproxy.proxycore.core.HttpForwarder;
 
 import static org.junit.Assert.assertEquals;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
 
 /**
  * Created by daniel on 3/04/18.
@@ -58,7 +58,7 @@ public class HttpForwarderTest {
     public void okHttpRequestsValidator() {
         initProxy("darodriguez", "Yaeslaultimavez@.");
         try {
-            HttpGet request0 = new HttpGet("http://mella.uci.cu");
+            HttpGet request0 = new HttpGet("http://mella.grgr.cu");
             HttpGet request1 = new HttpGet("http://cubadebate.cu");
             HttpResponse response = null;
             response = delegateClient.execute(request0);

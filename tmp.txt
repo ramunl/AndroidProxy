@@ -1817,11 +1817,11 @@ ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
     Receivers:
       - ReceiverList{c6e38d9 24367 com.lge.sizechangable.weather/10092/u0 remote:4f44720}
       - ReceiverList{d122d56 24367 com.lge.sizechangable.weather/10092/u0 remote:b677b71}
-  *APP* UID 10124 ProcessRecord{2bf88f8 19291:uci.wifiproxy/u0a124}
+  *APP* UID 10124 ProcessRecord{2bf88f8 19291:grgr.wifiproxy/u0a124}
     user #0 uid=10124 gids={50124, 9997, 3003}
     requiredAbi=armeabi-v7a instructionSet=null
-    dir=/data/app/uci.wifiproxy-2/base.apk publicDir=/data/app/uci.wifiproxy-2/base.apk data=/data/user/0/uci.wifiproxy
-    packageList={uci.wifiproxy}
+    dir=/data/app/grgr.wifiproxy-2/base.apk publicDir=/data/app/grgr.wifiproxy-2/base.apk data=/data/user/0/grgr.wifiproxy
+    packageList={grgr.wifiproxy}
     compat={320dpi}
     thread=android.app.ApplicationThreadProxy@f1911d1
     pid=19291 starting=false
@@ -1837,10 +1837,10 @@ ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
     hasStartedServices=true
     lastRequestedGc=-18s407ms lastLowMemory=-18s407ms reportLowMemory=false
     Services:
-      - ServiceRecord{4a51dc8 u0 uci.wifiproxy/uci.ucintlm.service.service.ProxyService}
-      - ServiceRecord{97a8483 u0 uci.wifiproxy/com.android.tools.fd.runtime.InstantRunService}
+      - ServiceRecord{4a51dc8 u0 grgr.wifiproxy/grgr.ucintlm.service.service.ProxyService}
+      - ServiceRecord{97a8483 u0 grgr.wifiproxy/com.android.tools.fd.runtime.InstantRunService}
     Connected Providers:
-      - 5bea71/com.android.providers.settings/.SettingsProvider->19291:uci.wifiproxy/u0a124 s1/1 u0/0 +11s414ms
+      - 5bea71/com.android.providers.settings/.SettingsProvider->19291:grgr.wifiproxy/u0a124 s1/1 u0/0 +11s414ms
   *APP* UID 1000 ProcessRecord{b7f499a 2927:com.lge.NfcSettings/1000}
     user #0 uid=1000 gids={41000, 9997, 2001, 1001, 1027, 1002, 3008, 3002, 1023, 1015, 3003, 3001, 1021, 3004, 3005, 1000, 2002, 3009, 1010, 1026, 1014, 1004, 1003, 1007, 1009, 4002}
     requiredAbi=armeabi instructionSet=arm
@@ -2804,7 +2804,7 @@ ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
     Proc #19: prcp  F/ /SF trm: 0 29469:android.process.media/u0a30 (service)
         com.android.providers.media/.MediaScannerService<=Proc{4864:com.dewmobile.kuaiya.play/u0a118}
     Proc #18: prcp  F/S/SF trm: 0 4864:com.dewmobile.kuaiya.play/u0a118 (fg-service)
-    Proc #15: prcp  F/S/SF trm: 0 19291:uci.wifiproxy/u0a124 (fg-service)
+    Proc #15: prcp  F/S/SF trm: 0 19291:grgr.wifiproxy/u0a124 (fg-service)
     Proc # 5: prcp  B/ /IB trm: 0 3922:com.lge.ime/u0a90 (service)
         com.lge.ime/.LgeImeImpl<=Proc{1629:system/1000}
     Proc #22: svc   B/ /S  trm: 0 7874:com.facebook.katana/u0a128 (started-services)
@@ -2908,7 +2908,7 @@ ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
     PID #19020: ProcessRecord{33208fc 19020:com.lge.email/u0a36}
     PID #19079: ProcessRecord{86e7ed2 19079:com.android.gallery3d/u0a35}
     PID #19183: ProcessRecord{5d98576 19183:com.lge.music/u0a43}
-    PID #19291: ProcessRecord{2bf88f8 19291:uci.wifiproxy/u0a124}
+    PID #19291: ProcessRecord{2bf88f8 19291:grgr.wifiproxy/u0a124}
     PID #19419: ProcessRecord{24249c1 19419:com.lge.aab/u0a2}
     PID #19467: ProcessRecord{83b318d 19467:com.lge.sizechangable.musicwidget.widget/u0a41}
     PID #19500: ProcessRecord{e360463 19500:com.lge.sync/1000}

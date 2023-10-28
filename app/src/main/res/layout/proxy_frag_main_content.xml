@@ -46,7 +46,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!--<uci.wifiproxy.util.fontAwesome.ButtonAwesome-->
+        <!--<grgr.wifiproxy.util.fontAwesome.ButtonAwesome-->
             <!--android:id="@+id/buttonViewPass"-->
             <!--android:layout_width="45dp"-->
             <!--android:layout_height="45dp"-->

@@ -2,23 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.CREATE_USERS"/>
-    <uses-permission android:name="android.permission.MANAGE_USERS"/>
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+<!--
+    <uses-permission android:name="android.permission.CREATE_USERS"/>
+    <uses-permission android:name="android.permission.MANAGE_USERS"/>
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"/>
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-
+-->
     <!--<uses-sdk-->
         <!--android:minSdkVersion="15"-->
         <!--android:targetSdkVersion="24" />-->
 
     <application
-        android:name="uci.localproxy.LocalProxyApplication"
+        android:name="grgr.localproxy.LocalProxyApplication"
         android:allowBackup="true"
         android:description="@string/description"
         android:icon="@mipmap/ic_launcher5"
@@ -30,7 +32,7 @@
 
         <activity
             android:exported ="true"
-            android:name="uci.localproxy.proxyscreen.ProxyActivity"
+            android:name="grgr.localproxy.proxyscreen.ProxyActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.OverlapSystemBar"
@@ -41,46 +43,38 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="uci.localproxy.profilescreens.addeditprofile.AddEditProfileActivity" />
-        <activity android:name="uci.localproxy.profilescreens.profiledetails.ProfileDetailsActivity" />
+        <activity android:name="grgr.localproxy.profilescreens.addeditprofile.AddEditProfileActivity" />
+        <activity android:name="grgr.localproxy.profilescreens.profiledetails.ProfileDetailsActivity" />
 
-        <activity android:name="uci.localproxy.firewallscreens.addeditfirewallrule.AddEditFirewallRuleActivity" />
-        <activity android:name="uci.localproxy.firewallscreens.firewallruledetails.FirewallRuleDetailsActivity" />
+        <activity android:name="grgr.localproxy.firewallscreens.addeditfirewallrule.AddEditFirewallRuleActivity" />
+        <activity android:name="grgr.localproxy.firewallscreens.firewallruledetails.FirewallRuleDetailsActivity" />
 
         <activity
-            android:name="uci.localproxy.profilescreens.profileslist.ProfilesListActivity"
+            android:name="grgr.localproxy.profilescreens.profileslist.ProfilesListActivity"
             android:launchMode="singleTop"
             tools:ignore="UnusedAttribute">
         </activity>
 
         <activity
-            android:name="uci.localproxy.firewallscreens.firewallruleslist.FirewallRulesListActivity"
+            android:name="grgr.localproxy.firewallscreens.firewallruleslist.FirewallRulesListActivity"
             android:launchMode="singleTop"
             tools:ignore="UnusedAttribute">
         </activity>
 
         <activity
-            android:name="uci.localproxy.tracescreens.traceslist.TracesListActivity"
+            android:name="grgr.localproxy.tracescreens.traceslist.TracesListActivity"
             android:launchMode="singleTop"
             tools:ignore="UnusedAttribute">
         </activity>
 
         <activity
-            android:name="uci.localproxy.headerscreen.HeaderListActivity"
+            android:name="grgr.localproxy.headerscreen.HeaderListActivity"
             android:launchMode="singleTop"
             tools:ignore="UnusedAttribute">
         </activity>
 
-        <service
-            android:name="uci.localproxy.proxycore.ProxyService"
-            android:icon="@mipmap/ic_launcher5"
-            android:label="WifiProxyService"
-            android:launchMode="singleTop"
-            android:stopWithTask="false">
-            <!--android:process=":UCIntlmService"-->
-        </service>
 
-        <activity android:name="uci.localproxy.aboutscreen.AboutActivity"
+        <activity android:name="grgr.localproxy.aboutscreen.AboutActivity"
             android:theme="@style/AppTheme.MaterialAboutActivity"/>
 
     </application>

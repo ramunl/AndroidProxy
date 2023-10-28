@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'uci.localproxy'
+    namespace 'grgr.localproxy'
     compileSdk 34
     defaultConfig {
         multiDexEnabled true
-        applicationId 'uci.localproxy'
+        applicationId 'grgr.localproxy'
         minSdkVersion 24
         targetSdkVersion 33
         versionCode 1
