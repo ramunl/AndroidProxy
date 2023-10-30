@@ -1,7 +1,5 @@
 package grgr.localproxy;
 
-import android.os.Build;
-
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
@@ -12,12 +10,10 @@ import io.realm.Realm;
  */
 
 public class LocalProxyApplication extends MultiDexApplication {
-    public static final int MAX_SDK_SUPPORTED_FOR_WIFI_CONF = Build.VERSION_CODES.LOLLIPOP_MR1;
     @Override
     public void onCreate() {
         super.onCreate();
         MultiDex.install(this);
-
         Realm.init(this);
     }
 }

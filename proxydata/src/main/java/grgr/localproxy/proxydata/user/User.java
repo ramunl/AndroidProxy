@@ -2,10 +2,10 @@ package grgr.localproxy.proxydata.user;
 
 import java.util.UUID;
 
+import grgr.localproxy.proxyutil.Security.Encripter;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
-import grgr.localproxy.proxyutil.Security.Encripter;
 
 /**
  * Created by daniel on 20/09/17.

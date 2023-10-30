@@ -2,11 +2,9 @@ package grgr.localproxy.proxydata.profile.source;
 
 import androidx.annotation.NonNull;
 
+import grgr.localproxy.proxydata.profile.Profile;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import grgr.localproxy.proxydata.profile.Profile;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by daniel on 16/09/17.

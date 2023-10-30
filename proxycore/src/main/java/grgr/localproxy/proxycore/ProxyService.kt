@@ -1,173 +1,148 @@
-package grgr.localproxy.proxycore;
+package grgr.localproxy.proxycore
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
-import android.content.Intent;
-import android.os.Build;
-import android.os.IBinder;
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
+import android.content.Intent
+import android.os.Build
+import android.os.IBinder
+import android.util.Log
+import grgr.localproxy.proxycore.core.HttpForwarder
+import java.io.IOException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import grgr.localproxy.proxycore.core.HttpForwarder;
-
-
-public class ProxyService extends Service {
-
-    public static final String CHANNEL_ONE_ID = "grgr.localproxy.proxycore.proxyservice";
-
-    public static final String CHANNEL_ONE_NAME = "Proxy Service";
-
-    public static final String MESSAGE_TAG = "message";
-
-    public static final String SERVICE_RECIVER_NAME = "service-receiver";
-
-    public static final int SERVICE_STARTED_SUCCESSFUL = 0;
-
-    public static final int ERROR_STARTING_SERVICE = 1;
-
-    public static boolean IS_SERVICE_RUNNING = false;
-
-    private String user = "";
+class ProxyService : Service() {
+    private var user: String? = ""
+    private val TAG = "ProxyService"
 
     //    private ServerTask s;
-    private HttpForwarder proxyThread;
-
-    private int NOTIFICATION = 1337;
-
-    private ExecutorService executor;
-
-    @Override
-    public void onCreate() {
-        executor = Executors.newSingleThreadExecutor();
-        super.onCreate();
+    private var proxyThread: HttpForwarder? = null
+    private val NOTIFICATION = 1337
+    private var executor: ExecutorService? = null
+    override fun onCreate() {
+        startForeground(NOTIFICATION, notifyit())
+        executor = Executors.newSingleThreadExecutor()
+        super.onCreate()
     }
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
+    override fun onBind(arg0: Intent): IBinder? {
+        return null
     }
 
-    @Override
-    public void onDestroy() {
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+        executor?.shutdown()
+        proxyThread?.halt()
         if (proxyThread != null) {
-            executor.shutdown();
-            proxyThread.halt();
+
             //if (set_global_proxy) {
-                //Toast.makeText(this, getString(R.string.OnNoProxy), Toast.LENGTH_LONG).show();
-               /* try {
+            //Toast.makeText(this, getString(R.string.OnNoProxy), Toast.LENGTH_LONG).show();
+            /* try {
                     WifiProxyChanger.clearProxySettings(this);
                 } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException |
                         NoSuchFieldException | IllegalAccessException | NullWifiConfigurationException | ApiNotSupportedException e) {
                     e.printStackTrace();
                 }*/
-          //  }
+            //  }
         }
-
-        IS_SERVICE_RUNNING = false;
-        super.onDestroy();
+        IS_SERVICE_RUNNING = false
+        super.onDestroy()
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand ${intent.extras}")
+        if (intent.extras == null) {
+            Log.e(TAG, "Error starting service")
+        } else {
+            Log.e(TAG, "Starting service..")
+            user = intent.getStringExtra("user")
+            val pass = intent.getStringExtra("pass")
+            val server = intent.getStringExtra("server")
+            val inPort = Integer.valueOf(intent.getStringExtra("inputport")!!)
+            val outPort = Integer.valueOf(intent.getStringExtra("outputport")!!)
+            // set_global_proxy = intent.getBooleanExtra("set_global_proxy", true);
+            val bypass = intent.getStringExtra("bypass")
+            val domain = intent.getStringExtra("domain")
+            Log.i(
+                TAG,
+                "Starting for user $user, server $server, input port $inPort, output port $outPort and bypass string: $bypass"
+            )
+            try {
+                proxyThread = HttpForwarder(
+                    server, inPort, user, pass, outPort, true, bypass,
+                    domain, applicationContext
+                )
+                executor!!.execute(proxyThread)
+                IS_SERVICE_RUNNING = true
+                //notifyit()
 
-        if (intent.getExtras() == null) {
-//            Log.e(getClass().getName(), "Error starting service");
-        }
-
-        user = intent.getStringExtra("user");
-        String pass = intent.getStringExtra("pass");
-        String server = intent.getStringExtra("server");
-        int inputport = Integer.valueOf(intent.getStringExtra("inputport"));
-        int outputport = Integer.valueOf(intent.getStringExtra("outputport"));
-       // set_global_proxy = intent.getBooleanExtra("set_global_proxy", true);
-        String bypass = intent.getStringExtra("bypass");
-        String domain = intent.getStringExtra("domain");
-
-
-//        Log.i(getClass().getName(), "Starting for user " + user + ", server " + server + ", input port " + String.valueOf(inputport) + ", output port" + String.valueOf(outputport) + " and bypass string: " + bypass);
-
-        try {
-            proxyThread = new HttpForwarder(server, inputport, user, pass, outputport, true, bypass,
-                    domain, getApplicationContext());
-
-            executor.execute(proxyThread);
-            IS_SERVICE_RUNNING = true;
-            notifyit();
-
-            //configuring wifi settings
-            /*try {
-                if (set_global_proxy) {
-                  //  Toast.makeText(this, getString(R.string.OnProxy), Toast.LENGTH_LONG).show();
-                    WifiProxyChanger.changeWifiStaticProxySettings("127.0.0.1", outputport, this);
-                }
-            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException |
-                    NoSuchFieldException | IllegalAccessException | NullWifiConfigurationException | ApiNotSupportedException e) {
-                e.printStackTrace();
-            }*/
-
-        } catch (IOException e) {
-            e.printStackTrace();
-//            Intent i = new Intent(SERVICE_RECIVER_NAME);
+                //configuring wifi settings
+                /*try {
+                    if (set_global_proxy) {
+                      //  Toast.makeText(this, getString(R.string.OnProxy), Toast.LENGTH_LONG).show();
+                        WifiProxyChanger.changeWifiStaticProxySettings("127.0.0.1", outputport, this);
+                    }
+                } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException |
+                        NoSuchFieldException | IllegalAccessException | NullWifiConfigurationException | ApiNotSupportedException e) {
+                    e.printStackTrace();
+                }*/
+            } catch (e: IOException) {
+                e.printStackTrace()
+                //            Intent i = new Intent(SERVICE_RECIVER_NAME);
 //            i.putExtra(MESSAGE_TAG, ERROR_STARTING_SERVICE);
 //            LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+            }
         }
+
 
         //START_REDELIVER_INTENT permite que si el sistema mata el servicio entonces cuando intenta reiniciarlo envia el mismo Intent que se envio para
         //iniciarlo por primera vez
-        return START_REDELIVER_INTENT;
+        return START_REDELIVER_INTENT
     }
 
-    public void notifyit() {
+    private fun notifyit(): Notification {
         /*
          * Este método asegura que el servicio permanece en el área de notificación
 		 * */
 
         //Intent i = new Intent(this, ProxyActivity.class);
-       // i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-       // PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
-
-
-        Notification.Builder builder = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ?
-                new Notification.Builder(this, CHANNEL_ONE_ID) : new Notification.Builder(this);
-
-        builder.setContentTitle("proxy is set")
-               // .setSmallIcon(R.mipmap.ic_launcher5)
-               // .setContentText(getApplicationContext().getString(R.string.excuting_proxy_service_notification) + " " + user)
-                .setWhen(System.currentTimeMillis());
-               // .setContentIntent(contentIntent);
-
+        // i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        // PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) Notification.Builder(
+            this,
+            CHANNEL_ONE_ID
+        ) else Notification.Builder(this)
+        builder.setContentTitle("proxy is set") // .setSmallIcon(R.mipmap.ic_launcher5)
+            // .setContentText(getApplicationContext().getString(R.string.excuting_proxy_service_notification) + " " + user)
+            .setWhen(System.currentTimeMillis())
+        // .setContentIntent(contentIntent);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ONE_ID,
-                    CHANNEL_ONE_NAME, NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.enableLights(true);
+            val notificationChannel = NotificationChannel(
+                CHANNEL_ONE_ID,
+                CHANNEL_ONE_NAME, NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationChannel.enableLights(true)
             //notificationChannel.setLightColor(getColor(R.color.colorPrimary));
-            notificationChannel.setShowBadge(true);
-            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            manager.createNotificationChannel(notificationChannel);
+            notificationChannel.setShowBadge(true)
+            notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(notificationChannel)
         }
-
-
-        Notification notification;
+        val notification: Notification
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            notification = builder.getNotification();
+            notification = builder.notification
         } else {
-            notification = builder.build();
-            notification.priority = Notification.PRIORITY_MAX;
+            notification = builder.build()
+            notification.priority = Notification.PRIORITY_MAX
         }
+        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
+        return notification
+        //startForeground(NOTIFICATION, notification)
+    } //This from <SandroProxy proyect>/projects/SandroProxyPlugin/src/org/sandroproxy/plugin/gui/MainActivity.java
 
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-
-        startForeground(NOTIFICATION, notification);
-    }
-
-
-    //This from <SandroProxy proyect>/projects/SandroProxyPlugin/src/org/sandroproxy/plugin/gui/MainActivity.java
-//    private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProxyService.class.getName());
+    //    private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProxyService.class.getName());
     /*
     private void ipTablesForTransparentProxy(boolean activate) {
         int processId = getApplicationInfo().uid;
@@ -272,5 +247,13 @@ public class ProxyService extends Service {
 //        }
     }
     */
+    companion object {
+        const val CHANNEL_ONE_ID = "grgr.localproxy.proxycore.proxyservice"
+        const val CHANNEL_ONE_NAME = "Proxy Service"
+        const val MESSAGE_TAG = "message"
+        const val SERVICE_RECIVER_NAME = "service-receiver"
+        const val SERVICE_STARTED_SUCCESSFUL = 0
+        const val ERROR_STARTING_SERVICE = 1
+        var IS_SERVICE_RUNNING = false
+    }
 }
-

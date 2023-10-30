@@ -1,14 +1,12 @@
 # LocalProxy
 
-The Remote doesn't work without the local one: 127.0.0.1:8080
-
-1) the precondition to make it work is:
-    adb root
-    adb shell settings put global http_proxy 127.0.0.1:8080
-2) check the current local proxy:
-    adb shell settings get global http_proxy
-3) then we can delete it with:
-    adb shell settings delete global http_proxy
+# 1. start proxy:
+# adb shell settings put global http_proxy 127.0.0.1:8080
+# adb shell am start-foreground-service -n grgr.localproxy/.proxycore.ProxyService
+# --es user <user> --es pass <pass> --es server <server> --es outputport <8080> --es inputport <inputport> --es bypass <127.0.0.1>
+# 2. stop proxy:
+# abd shell am stopservice -n grgr.localproxy/.proxycore.ProxyService
+# adb shell settings delete global http_proxy
 
 As the name suggests, the solution provides local proxy service on the device. This with the main objective of carrying out the authentication process with a proxy server and in this way allow access to the Internet in the installed applications. Initially it is very similar to applications like UCIntlm or UCIProxy, that is, it allows access to the Internet through the proxy server of a certain institution. Its difference lies in the idea that led to its development: it must operate in as many Cuban institutional networks as possible.
 For the development of the solution, a study of the authentication schemes most used in the proxy servers was carried out, a somewhat complicated study that yielded achievable results. In addition, similar applications were studied in detail: ProxyDroid, SandroProxy, Drony and UCIntlm, from which important functionalities were extracted that were implemented taking into account the level of usability for the end user. For its implementation, the UCIProxy and UCIntlm applications were reused at the abstraction and object level, several functionalities were added and important changes were introduced in the local proxy service.

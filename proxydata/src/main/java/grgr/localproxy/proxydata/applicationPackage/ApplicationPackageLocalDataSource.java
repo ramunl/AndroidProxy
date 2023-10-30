@@ -3,6 +3,7 @@ package grgr.localproxy.proxydata.applicationPackage;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
