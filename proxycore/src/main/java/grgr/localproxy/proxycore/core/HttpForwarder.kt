@@ -1,331 +1,257 @@
-package grgr.localproxy.proxycore.core;
+package grgr.localproxy.proxycore.core
 
-import android.content.Context;
-import android.util.Log;
-
-import com.google.common.base.Strings;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpEntityEnclosingRequest;
-import cz.msebera.android.httpclient.HttpHost;
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.NoHttpResponseException;
-import cz.msebera.android.httpclient.auth.AuthScope;
-import cz.msebera.android.httpclient.auth.NTCredentials;
-import cz.msebera.android.httpclient.client.CredentialsProvider;
-import cz.msebera.android.httpclient.client.HttpRequestRetryHandler;
-import cz.msebera.android.httpclient.client.methods.HttpDelete;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.client.methods.HttpHead;
-import cz.msebera.android.httpclient.client.methods.HttpOptions;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.client.methods.HttpPut;
-import cz.msebera.android.httpclient.client.methods.HttpTrace;
-import cz.msebera.android.httpclient.client.methods.HttpUriRequest;
-import cz.msebera.android.httpclient.client.methods.RequestBuilder;
-import cz.msebera.android.httpclient.impl.client.BasicCredentialsProvider;
-import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
-import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
-import cz.msebera.android.httpclient.impl.conn.PoolingHttpClientConnectionManager;
-import cz.msebera.android.httpclient.message.BasicHeader;
-import cz.msebera.android.httpclient.protocol.HttpContext;
-import grgr.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource;
-import grgr.localproxy.proxydata.firewallRule.FirewallRule;
-import grgr.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource;
-import grgr.localproxy.proxydata.header.HeaderDataSource;
-import grgr.localproxy.proxydata.trace.Trace;
-import grgr.localproxy.proxydata.trace.TraceDataSource;
-import grgr.localproxy.proxyutil.StringUtils;
-import grgr.localproxy.proxyutil.network.ClientResolver;
-import grgr.localproxy.proxyutil.network.ConnectionDescriptor;
+import android.content.Context
+import android.util.Log
+import com.google.common.base.Strings
+import cz.msebera.android.httpclient.Header
+import cz.msebera.android.httpclient.HttpEntityEnclosingRequest
+import cz.msebera.android.httpclient.HttpHost
+import cz.msebera.android.httpclient.HttpResponse
+import cz.msebera.android.httpclient.NoHttpResponseException
+import cz.msebera.android.httpclient.auth.AuthScope
+import cz.msebera.android.httpclient.auth.NTCredentials
+import cz.msebera.android.httpclient.client.CredentialsProvider
+import cz.msebera.android.httpclient.client.HttpRequestRetryHandler
+import cz.msebera.android.httpclient.client.methods.HttpDelete
+import cz.msebera.android.httpclient.client.methods.HttpGet
+import cz.msebera.android.httpclient.client.methods.HttpHead
+import cz.msebera.android.httpclient.client.methods.HttpOptions
+import cz.msebera.android.httpclient.client.methods.HttpPost
+import cz.msebera.android.httpclient.client.methods.HttpPut
+import cz.msebera.android.httpclient.client.methods.HttpTrace
+import cz.msebera.android.httpclient.client.methods.HttpUriRequest
+import cz.msebera.android.httpclient.client.methods.RequestBuilder
+import cz.msebera.android.httpclient.impl.client.BasicCredentialsProvider
+import cz.msebera.android.httpclient.impl.client.CloseableHttpClient
+import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
+import cz.msebera.android.httpclient.impl.conn.PoolingHttpClientConnectionManager
+import cz.msebera.android.httpclient.message.BasicHeader
+import grgr.localproxy.proxycore.ProxyService
+import grgr.localproxy.proxydata.applicationPackage.ApplicationPackageLocalDataSource
+import grgr.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource
+import grgr.localproxy.proxydata.header.HeaderDataSource
+import grgr.localproxy.proxydata.trace.Trace
+import grgr.localproxy.proxydata.trace.TraceDataSource
+import grgr.localproxy.proxyutil.StringUtils
+import grgr.localproxy.proxyutil.network.ClientResolver
+import grgr.localproxy.proxyutil.network.ConnectionDescriptor
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStream
+import java.net.InetAddress
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.UnknownHostException
+import java.util.Arrays
+import java.util.Calendar
+import java.util.concurrent.Executors
 
 /**
  * Created by daniel on 17/04/17.
  */
+class HttpForwarder(
+    private val addr: String, private val inport: Int, private val user: String,
+    private val pass: String, outport: Int, onlyLocal: Boolean,
+    private val bypass: String?, private val domain: String, context: Context?
+) : Thread() {
+    private var ssocket: ServerSocket? = null
+    private val manager: PoolingHttpClientConnectionManager
+    private val threadPool = Executors.newCachedThreadPool()
+    private var delegateClient: CloseableHttpClient? = null
+    private var noDelegateClient: CloseableHttpClient? = null
+    var running = true
+    private var credentials: CredentialsProvider? = null
+    private val clientResolver: ClientResolver
 
-public class HttpForwarder extends Thread {
-
-    private static List<String> stripHeadersIn = Arrays.asList(
-            "Content-Type", "Content-Length", "Proxy-Connection", "Keep-Alive"
-    );
-    private static List<String> stripHeadersOut = Arrays.asList(
-            "Proxy-Authentication", "Proxy-Authorization", "Transfer-Encoding"
-    );
-    private static List<String> stripHeaders = Arrays.asList(
-            "Proxy-Authentication", "Proxy-Authorization", "Transfer-Encoding",
-            "Connection", "Content-Type", "Content-Length", "Proxy-Connection", "Keep-Alive",
-            "TE", "Trailer", "Upgrade"
-    );
-
-    private static String CONNECTION_HEADER = "Connection";
-
-    private ServerSocket ssocket;
-    private PoolingHttpClientConnectionManager manager;
-    private ExecutorService threadPool = Executors.newCachedThreadPool();
-    private CloseableHttpClient delegateClient;
-    private CloseableHttpClient noDelegateClient;
-
-    private final int inport;
-    private final String addr;
-    private final String user;
-    private final String pass;
-    private final String bypass;
-    private final String domain;
-
-    public boolean running = true;
-
-    private CredentialsProvider credentials = null;
-
-    private ClientResolver clientResolver;
-
-    public HttpForwarder(String addr, int inport, String user,
-                         String pass, int outport, boolean onlyLocal,
-                         String bypass, String domain, Context context) throws IOException {
-        this.addr = addr;
-        this.inport = inport;
-        this.user = user;
-        this.pass = pass;
-        this.bypass = bypass;
-        this.domain = domain;
-
+    init {
         if (onlyLocal) {
-            this.ssocket = new ServerSocket(outport, 0,
-                    InetAddress.getByName("127.0.0.1"));
+            ssocket = ServerSocket(
+                outport, 0,
+                InetAddress.getByName("127.0.0.1")
+            )
         } else {
-            this.ssocket = new ServerSocket(outport);
+            ssocket = ServerSocket(outport)
         }
-
-        manager = new PoolingHttpClientConnectionManager();
-        manager.setDefaultMaxPerRoute(20);
-        manager.setMaxTotal(200);
-
-        credentials = new BasicCredentialsProvider();
-
-        clientResolver = new ClientResolver(context);
+        manager = PoolingHttpClientConnectionManager()
+        manager.defaultMaxPerRoute = 20
+        manager.maxTotal = 200
+        credentials = BasicCredentialsProvider()
+        clientResolver = ClientResolver(context)
 
 //        Log.e(getClass().getName(), "Starting proxy");
     }
 
-    public void run() {
+    override fun run() {
         try {
             //NTCredentials extends from UsernamePasswordCredential which means that can resolve
             //Basic, Digest and NTLM authentication schemes. The field of domain act like an realm,
             //it can be null and it will works correctly
-            credentials.setCredentials(new AuthScope(AuthScope.ANY),
-                    new NTCredentials(this.user, this.pass, InetAddress.getLocalHost().getHostName(),
-                            (Strings.isNullOrEmpty(domain) ? null : domain)
-                    )
-            );
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+            credentials!!.setCredentials(
+                AuthScope(AuthScope.ANY),
+                NTCredentials(
+                    user, pass, InetAddress.getLocalHost().hostName,
+                    if (Strings.isNullOrEmpty(domain)) null else domain
+                )
+            )
+            ProxyService.proxyConnectionState.value = ProxyConnectionState.CONNECTED
+        } catch (e: UnknownHostException) {
+            ProxyService.onFailed(e)
         }
-
-        this.delegateClient = HttpClientBuilder.create()
-                .setConnectionManager(manager)
-                .setProxy(new HttpHost(this.addr, this.inport))
-                .setDefaultCredentialsProvider(credentials)
-                .disableRedirectHandling()
-                .disableCookieManagement()
-//                .disableAuthCaching()
-                .disableAutomaticRetries()
-                .disableConnectionState()
-                .build();
-
-        this.noDelegateClient = HttpClientBuilder.create()
-                .setConnectionManager(manager)
-                .disableRedirectHandling()
-                .disableCookieManagement()
-                .disableAutomaticRetries()
-                .disableConnectionState()
-                .build();
-
+        delegateClient = HttpClientBuilder.create()
+            .setConnectionManager(manager)
+            .setProxy(HttpHost(addr, inport))
+            .setDefaultCredentialsProvider(credentials)
+            .disableRedirectHandling()
+            .disableCookieManagement() //                .disableAuthCaching()
+            .disableAutomaticRetries()
+            .disableConnectionState()
+            .build()
+        noDelegateClient = HttpClientBuilder.create()
+            .setConnectionManager(manager)
+            .disableRedirectHandling()
+            .disableCookieManagement()
+            .disableAutomaticRetries()
+            .disableConnectionState()
+            .build()
         while (running) {
             try {
 //                if (interrupted()) {
 //                    Log.e(getClass().getName(), "The proxy task was interrupted");
 //                }
-                Socket s = this.ssocket.accept();
-                this.threadPool.execute(new HttpForwarder.Handler(s));
-            } catch (IOException e) {
-                e.printStackTrace();
+                val s = ssocket!!.accept()
+                threadPool.execute(Handler(s))
+            } catch (e: IOException) {
+                ProxyService.onFailed(e)
             }
         }
-
     }
 
-    public void halt() {
+    fun halt() {
 //        Log.e(getClass().getName(), "Stoping proxy");
-        running = false;
-
-        manager.shutdown();
-        threadPool.shutdownNow();
+        running = false
+        manager.shutdown()
+        threadPool.shutdownNow()
         try {
-            this.delegateClient.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            delegateClient!!.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
         try {
-            this.noDelegateClient.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            noDelegateClient!!.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-
         try {
-            close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-
     }
 
-    public void close() throws IOException {
-        this.ssocket.close();
+    @Throws(IOException::class)
+    fun close() {
+        ssocket!!.close()
     }
 
-    class Handler implements Runnable {
-
-        Socket localSocket;
-        //ByteBuffer buffer = ByteBuffer.allocate(8192);
-
-        public Handler(Socket localSocket) {
-            this.localSocket = localSocket;
-        }
-
-        private CloseableHttpClient createDelegateClient() {
-            CloseableHttpClient client = HttpClientBuilder.create()
-//                .setConnectionManager(manager)
-                    .setProxy(new HttpHost(HttpForwarder.this.addr, HttpForwarder.this.inport))
-                    .setDefaultCredentialsProvider(credentials)
-                    .disableRedirectHandling()
-                    .disableCookieManagement()
-//                .disableAuthCaching()
-                    .disableAutomaticRetries()
-                    .setRetryHandler(new HttpRequestRetryHandler() {
-                        @Override
-                        public boolean retryRequest(IOException exception, int executionCount,
-                                                    HttpContext context) {
-                            if (executionCount > 3) {
+    internal inner class Handler    //ByteBuffer buffer = ByteBuffer.allocate(8192);
+        (var localSocket: Socket) : Runnable {
+        private fun createDelegateClient(): CloseableHttpClient {
+            return HttpClientBuilder.create() //                .setConnectionManager(manager)
+                .setProxy(HttpHost(addr, inport))
+                .setDefaultCredentialsProvider(credentials)
+                .disableRedirectHandling()
+                .disableCookieManagement() //                .disableAuthCaching()
+                .disableAutomaticRetries()
+                .setRetryHandler(HttpRequestRetryHandler { exception, executionCount, context ->
+                    if (executionCount > 3) {
 //                                LOGGER.warn("Maximum tries reached for client http pool ");
-                                return false;
-                            }
-                            if (exception instanceof NoHttpResponseException) {
-//                                LOGGER.warn("No response from server on " + executionCount + " call");
-                                return true;
-                            }
-                            return false;
-                        }
-                    })
-//                    .disableConnectionState()
-                    .build();
-
-            return client;
+                        return@HttpRequestRetryHandler false
+                    }
+                    exception is NoHttpResponseException
+                }) //                    .disableConnectionState()
+                .build()
         }
 
-
-        private CloseableHttpClient createNoDelegateClient() {
-            return HttpClientBuilder.create()
-//                .setConnectionManager(manager)
-                    .disableRedirectHandling()
-                    .disableCookieManagement()
-                    .disableAutomaticRetries()
-//                    .disableConnectionState()
-                    .setRetryHandler(new HttpRequestRetryHandler() {
-                        @Override
-                        public boolean retryRequest(IOException exception, int executionCount,
-                                                    HttpContext context) {
-                            if (executionCount > 3) {
+        private fun createNoDelegateClient(): CloseableHttpClient {
+            return HttpClientBuilder.create() //                .setConnectionManager(manager)
+                .disableRedirectHandling()
+                .disableCookieManagement()
+                .disableAutomaticRetries() //                    .disableConnectionState()
+                .setRetryHandler(HttpRequestRetryHandler { exception, executionCount, context ->
+                    if (executionCount > 3) {
 //                                LOGGER.warn("Maximum tries reached for client http pool ");
-                                return false;
-                            }
-                            if (exception instanceof NoHttpResponseException) {
-//                                LOGGER.warn("No response from server on " + executionCount + " call");
-                                return true;
-                            }
-                            return false;
-                        }
-                    })
-                    .build();
+                        return@HttpRequestRetryHandler false
+                    }
+                    exception is NoHttpResponseException
+                })
+                .build()
         }
 
-
-        private List<Header> getValidHeaders(Header[] parserHeaders) {
-            ArrayList<Header> resultHeaders = new ArrayList<>();
-            ArrayList<String> cnnHeaders = new ArrayList<>();
-            for (Header h : parserHeaders) {
-                if (h.getName().equals(CONNECTION_HEADER)) {
-                    String[] connectionHeaders = h.getValue().split(", ");
-                    cnnHeaders.addAll(Arrays.asList(connectionHeaders));
-                    break;
+        private fun getValidHeaders(parserHeaders: Array<Header>): MutableList<Header> {
+            val resultHeaders = ArrayList<Header>()
+            val cnnHeaders = ArrayList<String>()
+            for (h in parserHeaders) {
+                if (h.name == CONNECTION_HEADER) {
+                    val connectionHeaders =
+                        h.value.split(", ".toRegex()).dropLastWhile { it.isEmpty() }
+                            .toTypedArray()
+                    cnnHeaders.addAll(Arrays.asList(*connectionHeaders))
+                    break
                 }
             }
-            for (Header h : parserHeaders) {
-                if (stripHeaders.contains(h.getName()) || cnnHeaders.contains(h.getName()))
-                    continue;
-                resultHeaders.add(h);
+            for (h in parserHeaders) {
+                if (stripHeaders.contains(h.name) || cnnHeaders.contains(h.name)) continue
+                resultHeaders.add(h)
             }
-
-            return resultHeaders;
+            return resultHeaders
         }
 
-        private List<Header> replaceOrAddHeaders(List<Header> headers){
-            HeaderDataSource headerDataSource = HeaderDataSource.newInstance();
-            List<grgr.localproxy.proxydata.header.Header> headersToAddOrModify = headerDataSource.getAllHeaders();
-            if (!headersToAddOrModify.isEmpty()){
-                for (grgr.localproxy.proxydata.header.Header dataHeader : headersToAddOrModify){
-                    boolean contains = false;
-                    for (int i = 0; i < headers.size(); i++){
-                        Header h = headers.get(i);
-                        if (dataHeader.getName().equalsIgnoreCase(h.getName())){
-                            headers.set(i, new BasicHeader(h.getName(), dataHeader.getValue()));
-                            contains = true;
+        private fun replaceOrAddHeaders(headers: MutableList<Header>): List<Header> {
+            val headerDataSource = HeaderDataSource.newInstance()
+            val headersToAddOrModify = headerDataSource.allHeaders
+            if (!headersToAddOrModify.isEmpty()) {
+                for (dataHeader in headersToAddOrModify) {
+                    var contains = false
+                    for (i in headers.indices) {
+                        val h = headers[i]
+                        if (dataHeader.name.equals(h.name, ignoreCase = true)) {
+                            headers[i] = BasicHeader(h.name, dataHeader.value)
+                            contains = true
                         }
                     }
-                    if (!contains) headers.add(new BasicHeader(dataHeader.getName(), dataHeader.getValue()));
+                    if (!contains) headers.add(BasicHeader(dataHeader.name, dataHeader.value))
                 }
             }
-            return headers;
+            return headers
         }
 
-        public void run() {
-            HttpParser parser = null;
-            OutputStream os = null;
-            long bytes = 0;
-
+        override fun run() {
+            var parser: HttpParser? = null
+            var os: OutputStream? = null
+            var bytes: Long = 0
             try {
-                parser = new HttpParser(this.localSocket.getInputStream());
-                boolean validRequest = parser.parse();
-                os = this.localSocket.getOutputStream();
+                parser = HttpParser(localSocket.getInputStream())
+                val validRequest = parser.parse()
+                os = localSocket.getOutputStream()
                 if (!validRequest) {
-                    os.write("HTTP/1.1 400 Bad Request".getBytes());
-                    os.write("\r\n\n".getBytes());
-                    return;
+                    os.write("HTTP/1.1 400 Bad Request".toByteArray())
+                    os.write("\r\n\n".toByteArray())
+                    return
                 }
-            } catch (Exception e) {
-                return;
+            } catch (e: Exception) {
+                return
             }
-
-            ConnectionDescriptor connectionDescriptor = getPackageConnectionDescritor(localSocket.getPort(),
-                    localSocket.getInetAddress().getHostAddress());
-            String packageNameSource = connectionDescriptor.getNamespace();
-
-            Log.e("Request:", connectionDescriptor.getNamespace() +
-                    "(" + connectionDescriptor.getName() + ")" + ": " + parser.getUri());
+            val connectionDescriptor = getPackageConnectionDescritor(
+                localSocket.port,
+                localSocket.inetAddress.hostAddress
+            )
+            val packageNameSource = connectionDescriptor.namespace
+            Log.e(
+                "Request:", connectionDescriptor.namespace +
+                        "(" + connectionDescriptor.name + ")" + ": " + parser.getUri()
+            )
 
 //            for (Header h : parser.getHeaders()) {
 //                Log.e("Header", h.getName() + ":" + h.getValue());
@@ -334,231 +260,230 @@ public class HttpForwarder extends Thread {
             //Firewall action
             if (!firewallFilter(packageNameSource, parser.getUri())) {
                 try {
-                    os.write("HTTP/1.1 403 Forbidden".getBytes());
-                    os.write("\r\n".getBytes());
-                    os.write("\r\n".getBytes());
-                    os.write("<h1>Forbidden by LocalProxy's firewall</h1>".getBytes());
-                } catch (Exception e) {
+                    os.write("HTTP/1.1 403 Forbidden".toByteArray())
+                    os.write("\r\n".toByteArray())
+                    os.write("\r\n".toByteArray())
+                    os.write("<h1>Forbidden by LocalProxy's firewall</h1>".toByteArray())
+                } catch (e: Exception) {
                 }
-                return;
+                return
             }
-
-            if (parser.getMethod().equals("CONNECT")) {
-                bytes += resolveConnect(parser, os);
+            bytes += if (parser.getMethod() == "CONNECT") {
+                resolveConnect(parser, os)
             } else {
-                bytes += resolveOtherMethods(parser, os);
+                resolveOtherMethods(parser, os)
             }
-
-            saveTrace(packageNameSource,
-                    (connectionDescriptor.getName() != null) ? connectionDescriptor.getName() : Trace.UNKNOWN_APP_NAME,
-                    parser.getUri(), bytes);
-
+            saveTrace(
+                packageNameSource,
+                if (connectionDescriptor.name != null) connectionDescriptor.name else Trace.UNKNOWN_APP_NAME,
+                parser.getUri(), bytes
+            )
         }
 
-        private void saveTrace(String packageName, String name, String requestedUrl, long bytesSpent) {
-            Trace trace = Trace.newTrace(packageName, name, requestedUrl, bytesSpent, Calendar.getInstance().getTimeInMillis());
-            TraceDataSource traceDataSource = TraceDataSource.newInstance();
-            traceDataSource.saveTrace(trace);
-            traceDataSource.releaseResources();
-            traceDataSource = null;
+        private fun saveTrace(
+            packageName: String,
+            name: String,
+            requestedUrl: String,
+            bytesSpent: Long
+        ) {
+            val trace = Trace.newTrace(
+                packageName,
+                name,
+                requestedUrl,
+                bytesSpent,
+                Calendar.getInstance().timeInMillis
+            )
+            var traceDataSource = TraceDataSource.newInstance()
+            traceDataSource!!.saveTrace(trace)
+            traceDataSource.releaseResources()
+            traceDataSource = null
         }
 
-        private long resolveOtherMethods(HttpParser parser, OutputStream os) {
-            long bytes = 0;
-            InputStream inRemote = null;
-
-            CloseableHttpClient client;
-            boolean matches = (bypass != null) && StringUtils.matches(parser.getUri(), bypass);
-            if (matches) {
-                client = createNoDelegateClient();
-//                client = HttpForwarder.this.noDelegateClient;
+        private fun resolveOtherMethods(parser: HttpParser, os: OutputStream?): Long {
+            var bytes: Long = 0
+            var inRemote: InputStream? = null
+            val client: CloseableHttpClient
+            val matches = bypass != null && StringUtils.matches(parser.getUri(), bypass)
+            client = if (matches) {
+                createNoDelegateClient()
+                //                client = HttpForwarder.this.noDelegateClient;
 //                Log.i(getClass().getName(), "url matches bypass " + parser.getUri());
             } else {
-                client = createDelegateClient();
-//                client = HttpForwarder.this.delegateClient;
+                createDelegateClient()
+                //                client = HttpForwarder.this.delegateClient;
 //                Log.i(getClass().getName(), "url does not matches bypass " + parser.getUri());
             }
-            HttpUriRequest request;
-            HttpResponse response;
+            val request: HttpUriRequest
+            val response: HttpResponse
             try {
 
 //                Log.i(getClass().getName(), parser.getMethod() + " " + parser.getUri());
-                if (parser.getMethod().equals("GET")) {
-                    request = new HttpGet(parser.getUri());
-                } else if (parser.getMethod().equals("POST")) {
-                    request = new HttpPost(parser.getUri());
-                } else if (parser.getMethod().equals("HEAD")) {
-                    request = new HttpHead(parser.getUri());
-                } else if (parser.getMethod().equals("PUT")) {
-                    request = new HttpPut(parser.getUri());
-                } else if (parser.getMethod().equals("DELETE")) {
-                    request = new HttpDelete(parser.getUri());
-                } else if (parser.getMethod().equals("OPTIONS")) {
-                    request = new HttpOptions(parser.getUri());
-                } else if (parser.getMethod().equals("TRACE")) {
-                    request = new HttpTrace(parser.getUri());
+                request = if (parser.getMethod() == "GET") {
+                    HttpGet(parser.getUri())
+                } else if (parser.getMethod() == "POST") {
+                    HttpPost(parser.getUri())
+                } else if (parser.getMethod() == "HEAD") {
+                    HttpHead(parser.getUri())
+                } else if (parser.getMethod() == "PUT") {
+                    HttpPut(parser.getUri())
+                } else if (parser.getMethod() == "DELETE") {
+                    HttpDelete(parser.getUri())
+                } else if (parser.getMethod() == "OPTIONS") {
+                    HttpOptions(parser.getUri())
+                } else if (parser.getMethod() == "TRACE") {
+                    HttpTrace(parser.getUri())
                 } else {
-                    request = RequestBuilder.create(parser.getMethod())
-                            .setUri(parser.getUri())
-                            .build();
+                    RequestBuilder.create(parser.getMethod())
+                        .setUri(parser.getUri())
+                        .build()
                 }
-
-                if (request instanceof HttpEntityEnclosingRequest) {
-                    HttpEntityEnclosingRequest request1 = (HttpEntityEnclosingRequest) request;
-                    request1.setEntity(new StreamingRequestEntity(parser));
+                if (request is HttpEntityEnclosingRequest) {
+                    val request1 = request as HttpEntityEnclosingRequest
+                    request1.entity = StreamingRequestEntity(parser)
                 }
-
-                List<Header> requestHeaders = getValidHeaders(parser.getHeaders());
-                List<Header> modifiedHeaders = replaceOrAddHeaders(requestHeaders);
-                request.setHeaders(modifiedHeaders.toArray(new Header[modifiedHeaders.size()]));
-
-                response = client.execute(request);
-                this.localSocket.shutdownInput();
-
-                os.write(response.getStatusLine().toString().getBytes());
-//                Log.e("STATUS-LINE", response.getStatusLine().toString());
-                os.write("\r\n".getBytes());
-
-                List<Header> responseHeaders = getValidHeaders(response.getAllHeaders());
-                for (Header h : responseHeaders) {
-                    os.write((h.toString() + "\r\n").getBytes());
+                val requestHeaders = getValidHeaders(parser.getHeaders())
+                val modifiedHeaders = replaceOrAddHeaders(requestHeaders)
+                request.setHeaders(modifiedHeaders.toTypedArray())
+                response = client.execute(request)
+                localSocket.shutdownInput()
+                os!!.write(response.getStatusLine().toString().toByteArray())
+                //                Log.e("STATUS-LINE", response.getStatusLine().toString());
+                os.write("\r\n".toByteArray())
+                val responseHeaders: List<Header> = getValidHeaders(response.getAllHeaders())
+                for (h in responseHeaders) {
+                    os.write(
+                        """$h""".toByteArray()
+                    )
                 }
-
                 if (response.getEntity() != null) {
-                    os.write("\r\n".getBytes());
-                    inRemote = response.getEntity().getContent();
-                    bytes += new Piper(inRemote, os).startCopy();
+                    os.write("\r\n".toByteArray())
+                    inRemote = response.getEntity().content
+                    bytes += Piper(inRemote, os).startCopy()
                 }
-
-            } catch (Exception e) {
+            } catch (e: Exception) {
             } finally {
                 if (inRemote != null) try {
-                    inRemote.close();
-                } catch (IOException e) {
+                    inRemote.close()
+                } catch (e: IOException) {
                 }
                 try {
-                    os.close();
-                } catch (IOException e) {
+                    os!!.close()
+                } catch (e: IOException) {
                 }
                 try {
-                    this.localSocket.close();
-                } catch (IOException e) {
+                    localSocket.close()
+                } catch (e: IOException) {
                 }
                 try {
-                    client.close();
-                } catch (IOException e) {
+                    client.close()
+                } catch (e: IOException) {
                 }
             }
-
-            return bytes;
+            return bytes
         }
 
-        private long resolveConnect(HttpParser parser, OutputStream os) {
+        private fun resolveConnect(parser: HttpParser, os: OutputStream?): Long {
 //            Log.e(getClass().getName(), "CONNECT " + parser.getUri());
 //            for (Header h : parser.getHeaders()){
 //                Log.e("Header", h.getName() + " : " + h.getValue());
 //            }
-
-            long bytes = 0;
-            boolean matches = (bypass != null) && StringUtils.matches(parser.getUri(), bypass);
-            if (!matches) {
+            var bytes: Long = 0
+            val matches = bypass != null && StringUtils.matches(parser.getUri(), bypass)
+            bytes += if (!matches) {
 //                Log.i(getClass().getName(), "url does not matches bypass " + parser.getUri());
-                bytes += doConnect(parser, os);
+                doConnect(parser, os)
             } else {
 //                Log.i(getClass().getName(), "url matches bypass " + parser.getUri());
-                bytes += doConnectNoProxy(parser, os);
+                doConnectNoProxy(parser, os)
             }
-            return bytes;
+            return bytes
         }
 
-
-        private void printResponse(HttpResponse response) throws IOException {
-            String line;
-            BufferedReader bf = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            while ((line = bf.readLine()) != null) {
-                Log.e("InputStream", line);
+        @Throws(IOException::class)
+        private fun printResponse(response: HttpResponse) {
+            var line: String?
+            val bf = BufferedReader(InputStreamReader(response.entity.content))
+            while (bf.readLine().also { line = it } != null) {
+                Log.e("InputStream", line!!)
             }
-
         }
 
-
-        public boolean firewallFilter(String packageNameSource, String uri) {
-            FirewallRuleLocalDataSource firewallRuleLocalDataSource = FirewallRuleLocalDataSource.newInstance();
-            try {
-                for (FirewallRule firewallRule : firewallRuleLocalDataSource.getActiveFirewallRules()) {
-                    if (
-                            (firewallRule.getApplicationPackageName().equals(ApplicationPackageLocalDataSource.ALL_APPLICATION_PACKAGES_STRING)
-                                    && StringUtils.matches(uri, firewallRule.getRule()))
-                                    || (packageNameSource.equals(firewallRule.getApplicationPackageName())
-                                    && StringUtils.matches(uri, firewallRule.getRule()))
-                            ) {
+        fun firewallFilter(packageNameSource: String, uri: String?): Boolean {
+            var firewallRuleLocalDataSource = FirewallRuleLocalDataSource.newInstance()
+            return try {
+                for (firewallRule in firewallRuleLocalDataSource!!.activeFirewallRules) {
+                    if (firewallRule.applicationPackageName == ApplicationPackageLocalDataSource.ALL_APPLICATION_PACKAGES_STRING && StringUtils.matches(
+                            uri,
+                            firewallRule.rule
+                        ) || packageNameSource == firewallRule.applicationPackageName && StringUtils.matches(
+                            uri,
+                            firewallRule.rule
+                        )
+                    ) {
 //                        Log.i(getClass().getName(), packageNameSource + " : " + uri + " blocked by firewall");
-                        return false;
+                        return false
                     }
                 }
 
 //                Log.i(getClass().getName(), packageNameSource + " : " + uri + " pass the firewall");
-                return true;
+                true
             } finally {
-                firewallRuleLocalDataSource.releaseResources();
-                firewallRuleLocalDataSource = null;
+                firewallRuleLocalDataSource!!.releaseResources()
+                firewallRuleLocalDataSource = null
             }
         }
 
-        private ConnectionDescriptor getPackageConnectionDescritor(int localPort, String localAddress) {
-            ConnectionDescriptor connectionDescriptor = clientResolver.getClientDescriptor(localPort, localAddress);
-            return connectionDescriptor;
+        private fun getPackageConnectionDescritor(
+            localPort: Int,
+            localAddress: String
+        ): ConnectionDescriptor {
+            return clientResolver.getClientDescriptor(localPort, localAddress)
         }
 
         //TODO> copiar cabezeras al destino al inicio de la peticion
-        long doConnectNoProxy(HttpParser parser, OutputStream os) {
-            long bytes = 0;
-            String[] uri = parser.getUri().split(":");
-            Socket remoteSocket = null;
-            InputStream inRemote = null;
-            OutputStream outRemote = null;
-
+        private fun doConnectNoProxy(parser: HttpParser, os: OutputStream?): Long {
+            var bytes: Long = 0
+            val uri = parser.getUri().split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            var remoteSocket: Socket? = null
+            var inRemote: InputStream? = null
+            var outRemote: OutputStream? = null
             try {
-                remoteSocket = new Socket(uri[0], Integer.parseInt(uri[1]));
-                inRemote = remoteSocket.getInputStream();
-                outRemote = remoteSocket.getOutputStream();
-
-                os.write("HTTP/1.1 200 OK".getBytes());
-                os.write("\r\n\r\n".getBytes());
-
-                threadPool.execute(new Piper(parser, outRemote));
-                bytes += new Piper(inRemote, os).startCopy();
-
-            } catch (Exception e) {
-                Log.e("Error", parser.getMethod() + parser.getUri());
+                remoteSocket = Socket(uri[0], uri[1].toInt())
+                inRemote = remoteSocket.getInputStream()
+                outRemote = remoteSocket.getOutputStream()
+                os!!.write("HTTP/1.1 200 OK".toByteArray())
+                os.write("\r\n\r\n".toByteArray())
+                threadPool.execute(Piper(parser, outRemote))
+                bytes += Piper(inRemote, os).startCopy()
+            } catch (e: Exception) {
+                Log.e("Error", parser.getMethod() + parser.getUri())
             } finally {
                 if (remoteSocket != null) {
                     try {
-                        remoteSocket.close();
-                    } catch (Exception fe) {
+                        remoteSocket.close()
+                    } catch (fe: Exception) {
                     }
                 }
                 try {
-                    os.close();
-                } catch (IOException e) {
+                    os!!.close()
+                } catch (e: IOException) {
                 }
                 try {
-                    parser.close();
-                } catch (IOException e) {
+                    parser.close()
+                } catch (e: IOException) {
                 }
             }
-
-            return bytes;
-
+            return bytes
         }
 
-        long doConnect(HttpParser parser, OutputStream os) {
-            long bytes = 0;
-            String[] uri = parser.getUri().split(":");
-            Socket remoteSocket = null;
-            InputStream inRemote = null;
-            OutputStream outRemote = null;
-
+        private fun doConnect(parser: HttpParser, os: OutputStream?): Long {
+            var bytes: Long = 0
+            val uri = parser.getUri().split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            var remoteSocket: Socket? = null
+            var inRemote: InputStream? = null
+            var outRemote: OutputStream? = null
             try {
 //                BufferedReader i = new BufferedReader(
 //                        new InputStreamReader(parser));
@@ -566,56 +491,60 @@ public class HttpForwarder extends Thread {
 //                while ((line = i.readLine()) != null) {
 //                    Log.e("InputStream", line);
 //                }
-
-                AdaptedProxyClient client = new AdaptedProxyClient();
-                HttpHost proxyHost = new HttpHost(addr, inport);
-                HttpHost targetHost = new HttpHost(uri[0], Integer.parseInt(uri[1]));
-
-                List<Header> requestHeaders = getValidHeaders(parser.getHeaders());
-                List<Header> modifiedHeaders = replaceOrAddHeaders(requestHeaders);
-                for(Header h : modifiedHeaders){
-                    Log.e("Header", h.getName() + " : " + h.getValue());
+                val client = AdaptedProxyClient()
+                val proxyHost = HttpHost(addr, inport)
+                val targetHost = HttpHost(uri[0], uri[1].toInt())
+                val requestHeaders = getValidHeaders(parser.getHeaders())
+                val modifiedHeaders = replaceOrAddHeaders(requestHeaders)
+                for (h in modifiedHeaders) {
+                    Log.e("Header", h.name + " : " + h.value)
                 }
-
                 remoteSocket = client.tunnel(
-                        proxyHost,
-                        targetHost,
-                        credentials.getCredentials(AuthScope.ANY),
-                        modifiedHeaders.toArray(new Header[modifiedHeaders.size()])
-                        );
-
-                inRemote = remoteSocket.getInputStream();
-                outRemote = remoteSocket.getOutputStream();
-
-                os.write("HTTP/1.1 200 OK".getBytes());
-                os.write("\r\n\r\n".getBytes());
-                threadPool.execute(new Piper(parser, outRemote));
-
-                bytes += new Piper(inRemote, os).startCopy();
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                    proxyHost,
+                    targetHost,
+                    credentials!!.getCredentials(AuthScope.ANY),
+                    modifiedHeaders.toTypedArray()
+                )
+                inRemote = remoteSocket.getInputStream()
+                outRemote = remoteSocket.getOutputStream()
+                os!!.write("HTTP/1.1 200 OK".toByteArray())
+                os.write("\r\n\r\n".toByteArray())
+                threadPool.execute(Piper(parser, outRemote))
+                bytes += Piper(inRemote, os).startCopy()
+            } catch (e: Exception) {
+                ProxyService.onFailed(e)
             } finally {
                 try {
-                    if (inRemote != null) inRemote.close();
-                } catch (IOException e) {
+                    inRemote?.close()
+                } catch (e: IOException) {
                 }
                 try {
-                    if (outRemote != null) outRemote.close();
-                } catch (IOException e) {
+                    outRemote?.close()
+                } catch (e: IOException) {
                 }
                 if (remoteSocket != null) {
                     try {
-                        remoteSocket.close();
-                    } catch (Exception fe) {
+                        remoteSocket.close()
+                    } catch (fe: Exception) {
                     }
                 }
             }
-
-            return bytes;
-
+            return bytes
         }
-
     }
 
+    companion object {
+        private val stripHeadersIn: List<String> = mutableListOf(
+            "Content-Type", "Content-Length", "Proxy-Connection", "Keep-Alive"
+        )
+        private val stripHeadersOut: List<String> = mutableListOf(
+            "Proxy-Authentication", "Proxy-Authorization", "Transfer-Encoding"
+        )
+        private val stripHeaders: List<String> = mutableListOf(
+            "Proxy-Authentication", "Proxy-Authorization", "Transfer-Encoding",
+            "Connection", "Content-Type", "Content-Length", "Proxy-Connection", "Keep-Alive",
+            "TE", "Trailer", "Upgrade"
+        )
+        private const val CONNECTION_HEADER = "Connection"
+    }
 }

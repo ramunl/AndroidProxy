@@ -61,14 +61,14 @@ class ProxyService : Service() {
             Log.e(TAG, "Error starting service")
         } else {
             Log.e(TAG, "Starting service..")
-            user = intent.getStringExtra("user")
-            val pass = intent.getStringExtra("pass")
-            val server = intent.getStringExtra("server")
-            val inPort = Integer.valueOf(intent.getStringExtra("inputport")!!)
-            val outPort = Integer.valueOf(intent.getStringExtra("outputport")!!)
+            user = intent.getStringExtra("user")!!
+            val pass = intent.getStringExtra("pass")!!
+            val server = intent.getStringExtra("server")!!
+            val inPort = Integer.valueOf(intent.getStringExtra("inputport")!!)!!
+            val outPort = Integer.valueOf(intent.getStringExtra("outputport")!!)!!
             // set_global_proxy = intent.getBooleanExtra("set_global_proxy", true);
-            val bypass = intent.getStringExtra("bypass")
-            val domain = intent.getStringExtra("domain")
+            val bypass = intent.getStringExtra("bypass")!!
+            val domain = intent.getStringExtra("domain") ?: ""
             proxyErrInfoState.value = "Starting service.. \n" +
                     "user: $user \n" +
                     "server: $server \n" +
@@ -79,7 +79,7 @@ class ProxyService : Service() {
                     "domain: $domain "
             try {
                 proxyThread = HttpForwarder(
-                    server, inPort, user, pass, outPort, true, bypass,
+                    server, inPort, user!!, pass, outPort, true, bypass,
                     domain, applicationContext
                 )
                 executor!!.execute(proxyThread)
@@ -248,6 +248,11 @@ class ProxyService : Service() {
     }
     */
     companion object {
+        fun onFailed(e: Exception) {
+            proxyErrInfoState.value = e.localizedMessage ?: e.stackTraceToString()
+            proxyConnectionState.value = ProxyConnectionState.FAILED
+        }
+
         const val CHANNEL_ONE_ID = "grgr.localproxy.proxycore.proxyservice"
         const val CHANNEL_ONE_NAME = "Proxy Service"
         val proxyConnectionState = mutableStateOf(ProxyConnectionState.IDLE)
