@@ -126,4 +126,5 @@
     <string name="new_h">New</string>
     <string name="edit_h">Edit</string>
     <string name="ok">Ok</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

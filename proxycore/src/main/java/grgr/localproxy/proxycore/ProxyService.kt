@@ -1,5 +1,6 @@
 package grgr.localproxy.proxycore
 
+import ProxyConnectionState
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import grgr.localproxy.proxycore.core.HttpForwarder
 import java.io.IOException
 import java.util.concurrent.ExecutorService
@@ -22,6 +24,8 @@ class ProxyService : Service() {
     private val NOTIFICATION = 1337
     private var executor: ExecutorService? = null
     override fun onCreate() {
+        proxyErrInfoState.value = "Service created"
+        proxyConnectionState.value = ProxyConnectionState.CONNECTING
         startForeground(NOTIFICATION, notifyit())
         executor = Executors.newSingleThreadExecutor()
         super.onCreate()
@@ -36,7 +40,6 @@ class ProxyService : Service() {
         executor?.shutdown()
         proxyThread?.halt()
         if (proxyThread != null) {
-
             //if (set_global_proxy) {
             //Toast.makeText(this, getString(R.string.OnNoProxy), Toast.LENGTH_LONG).show();
             /* try {
@@ -47,7 +50,8 @@ class ProxyService : Service() {
                 }*/
             //  }
         }
-        IS_SERVICE_RUNNING = false
+        proxyErrInfoState.value = "Service destroyed"
+        proxyConnectionState.value = ProxyConnectionState.DISCONNECTED
         super.onDestroy()
     }
 
@@ -65,17 +69,21 @@ class ProxyService : Service() {
             // set_global_proxy = intent.getBooleanExtra("set_global_proxy", true);
             val bypass = intent.getStringExtra("bypass")
             val domain = intent.getStringExtra("domain")
-            Log.i(
-                TAG,
-                "Starting for user $user, server $server, input port $inPort, output port $outPort and bypass string: $bypass"
-            )
+            proxyErrInfoState.value = "Starting service.. \n" +
+                    "user: $user \n" +
+                    "server: $server \n" +
+                    "pass: $pass \n" +
+                    "ip: $inPort \n" +
+                    "op: $outPort \n" +
+                    "bypass: $bypass \n" +
+                    "domain: $domain "
             try {
                 proxyThread = HttpForwarder(
                     server, inPort, user, pass, outPort, true, bypass,
                     domain, applicationContext
                 )
                 executor!!.execute(proxyThread)
-                IS_SERVICE_RUNNING = true
+               // proxyConnectionState.value = ProxyConnectionState.CONNECTED
                 //notifyit()
 
                 //configuring wifi settings
@@ -89,10 +97,8 @@ class ProxyService : Service() {
                     e.printStackTrace();
                 }*/
             } catch (e: IOException) {
-                e.printStackTrace()
-                //            Intent i = new Intent(SERVICE_RECIVER_NAME);
-//            i.putExtra(MESSAGE_TAG, ERROR_STARTING_SERVICE);
-//            LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+                proxyConnectionState.value = ProxyConnectionState.FAILED
+                proxyErrInfoState.value = e.localizedMessage ?: e.stackTraceToString()
             }
         }
 
@@ -126,20 +132,14 @@ class ProxyService : Service() {
             notificationChannel.enableLights(true)
             //notificationChannel.setLightColor(getColor(R.color.colorPrimary));
             notificationChannel.setShowBadge(true)
+
             notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(notificationChannel)
         }
-        val notification: Notification
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            notification = builder.notification
-        } else {
-            notification = builder.build()
-            notification.priority = Notification.PRIORITY_MAX
-        }
+        val notification: Notification = builder.build()
         notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
         return notification
-        //startForeground(NOTIFICATION, notification)
     } //This from <SandroProxy proyect>/projects/SandroProxyPlugin/src/org/sandroproxy/plugin/gui/MainActivity.java
 
     //    private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProxyService.class.getName());
@@ -250,10 +250,7 @@ class ProxyService : Service() {
     companion object {
         const val CHANNEL_ONE_ID = "grgr.localproxy.proxycore.proxyservice"
         const val CHANNEL_ONE_NAME = "Proxy Service"
-        const val MESSAGE_TAG = "message"
-        const val SERVICE_RECIVER_NAME = "service-receiver"
-        const val SERVICE_STARTED_SUCCESSFUL = 0
-        const val ERROR_STARTING_SERVICE = 1
-        var IS_SERVICE_RUNNING = false
+        val proxyConnectionState = mutableStateOf(ProxyConnectionState.IDLE)
+        val proxyErrInfoState = mutableStateOf("no errors")
     }
 }
