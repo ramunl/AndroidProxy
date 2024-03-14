@@ -13,9 +13,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,13 +43,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RootView(vm: ProxyManagerVM) {
     val textStyle = TextStyle.Default.copy(fontSize = 44.sp)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .semantics {
+                testTagsAsResourceId = true
+            }
+        ,
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
     ) {
@@ -55,6 +63,7 @@ fun RootView(vm: ProxyManagerVM) {
             text = "connection: " + vm.proxyState.value.state.toString(),
             modifier = Modifier.semantics {
                 testTag = "connectionStateTag"
+                contentDescription = "connectionStateDesc"
             },
             style = textStyle
         )

@@ -11,13 +11,13 @@ import android.os.IBinder
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import grgr.localproxy.proxycore.core.HttpForwarder
+import grgr.localproxy.proxyutil.LOG_TAG
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class ProxyService : Service() {
     private var user: String? = ""
-    private val TAG = "ProxyService"
 
     //    private ServerTask s;
     private var proxyThread: HttpForwarder? = null
@@ -25,8 +25,9 @@ class ProxyService : Service() {
     private var executor: ExecutorService? = null
     override fun onCreate() {
         proxyErrInfoState.value = "Service created"
+        Log.d(LOG_TAG, "Service created")
         proxyConnectionState.value = ProxyConnectionState.CONNECTING
-        startForeground(NOTIFICATION, notifyit())
+        startForeground(NOTIFICATION, notifyIt())
         executor = Executors.newSingleThreadExecutor()
         super.onCreate()
     }
@@ -36,7 +37,7 @@ class ProxyService : Service() {
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy")
+        Log.d(LOG_TAG, "onDestroy")
         executor?.shutdown()
         proxyThread?.halt()
         if (proxyThread != null) {
@@ -51,16 +52,17 @@ class ProxyService : Service() {
             //  }
         }
         proxyErrInfoState.value = "Service destroyed"
+        Log.d(LOG_TAG, "Service destroyed")
         proxyConnectionState.value = ProxyConnectionState.DISCONNECTED
         super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d(TAG, "onStartCommand ${intent.extras}")
+        Log.d(LOG_TAG, "onStartCommand ${intent.extras}")
         if (intent.extras == null) {
-            Log.e(TAG, "Error starting service")
+            Log.d(LOG_TAG, "Error starting service")
         } else {
-            Log.e(TAG, "Starting service..")
+            Log.d(LOG_TAG, "Starting service..")
             user = intent.getStringExtra("user")!!
             val pass = intent.getStringExtra("pass")!!
             val server = intent.getStringExtra("server")!!
@@ -97,9 +99,11 @@ class ProxyService : Service() {
                     e.printStackTrace();
                 }*/
             } catch (e: IOException) {
+                Log.e(LOG_TAG, "Starting service error: ${e.localizedMessage}")
                 proxyConnectionState.value = ProxyConnectionState.FAILED
                 proxyErrInfoState.value = e.localizedMessage ?: e.stackTraceToString()
             }
+            Log.d(LOG_TAG, "Starting service: ok!")
         }
 
 
@@ -108,7 +112,7 @@ class ProxyService : Service() {
         return START_REDELIVER_INTENT
     }
 
-    private fun notifyit(): Notification {
+    private fun notifyIt(): Notification {
         /*
          * Este método asegura que el servicio permanece en el área de notificación
 		 * */
@@ -132,7 +136,6 @@ class ProxyService : Service() {
             notificationChannel.enableLights(true)
             //notificationChannel.setLightColor(getColor(R.color.colorPrimary));
             notificationChannel.setShowBadge(true)
-
             notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(notificationChannel)
@@ -249,6 +252,7 @@ class ProxyService : Service() {
     */
     companion object {
         fun onFailed(e: Exception) {
+            Log.d(LOG_TAG, "onFailed $e")
             proxyErrInfoState.value = e.localizedMessage ?: e.stackTraceToString()
             proxyConnectionState.value = ProxyConnectionState.FAILED
         }

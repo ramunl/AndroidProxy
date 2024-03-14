@@ -16,7 +16,7 @@ public class ClientResolver {
 
     
     private static boolean LOGD = false;
-    private static String TAG = ClientResolver.class.getSimpleName();
+    private static String TAG = "ANDROID_PROXY";
     
     private Context mContext;
     private PackageManager packageManager;

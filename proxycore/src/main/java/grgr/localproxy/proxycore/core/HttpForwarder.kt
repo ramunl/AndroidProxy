@@ -32,6 +32,7 @@ import grgr.localproxy.proxydata.firewallRule.FirewallRuleLocalDataSource
 import grgr.localproxy.proxydata.header.HeaderDataSource
 import grgr.localproxy.proxydata.trace.Trace
 import grgr.localproxy.proxydata.trace.TraceDataSource
+import grgr.localproxy.proxyutil.LOG_TAG
 import grgr.localproxy.proxyutil.StringUtils
 import grgr.localproxy.proxyutil.network.ClientResolver
 import grgr.localproxy.proxyutil.network.ConnectionDescriptor
@@ -95,6 +96,7 @@ class HttpForwarder(
                     if (Strings.isNullOrEmpty(domain)) null else domain
                 )
             )
+            Log.d(LOG_TAG, "Service CONNECTED")
             ProxyService.proxyConnectionState.value = ProxyConnectionState.CONNECTED
         } catch (e: UnknownHostException) {
             ProxyService.onFailed(e)
@@ -197,7 +199,7 @@ class HttpForwarder(
                     val connectionHeaders =
                         h.value.split(", ".toRegex()).dropLastWhile { it.isEmpty() }
                             .toTypedArray()
-                    cnnHeaders.addAll(Arrays.asList(*connectionHeaders))
+                    cnnHeaders.addAll(listOf(*connectionHeaders))
                     break
                 }
             }
@@ -211,7 +213,7 @@ class HttpForwarder(
         private fun replaceOrAddHeaders(headers: MutableList<Header>): List<Header> {
             val headerDataSource = HeaderDataSource.newInstance()
             val headersToAddOrModify = headerDataSource.allHeaders
-            if (!headersToAddOrModify.isEmpty()) {
+            if (headersToAddOrModify.isNotEmpty()) {
                 for (dataHeader in headersToAddOrModify) {
                     var contains = false
                     for (i in headers.indices) {
@@ -249,7 +251,7 @@ class HttpForwarder(
             )
             val packageNameSource = connectionDescriptor.namespace
             Log.e(
-                "Request:", connectionDescriptor.namespace +
+                LOG_TAG, connectionDescriptor.namespace +
                         "(" + connectionDescriptor.name + ")" + ": " + parser.getUri()
             )
 
@@ -404,7 +406,7 @@ class HttpForwarder(
             var line: String?
             val bf = BufferedReader(InputStreamReader(response.entity.content))
             while (bf.readLine().also { line = it } != null) {
-                Log.e("InputStream", line!!)
+                Log.e(LOG_TAG, line!!)
             }
         }
 
@@ -457,7 +459,7 @@ class HttpForwarder(
                 threadPool.execute(Piper(parser, outRemote))
                 bytes += Piper(inRemote, os).startCopy()
             } catch (e: Exception) {
-                Log.e("Error", parser.getMethod() + parser.getUri())
+                Log.e(LOG_TAG, parser.getMethod() + parser.getUri())
             } finally {
                 if (remoteSocket != null) {
                     try {

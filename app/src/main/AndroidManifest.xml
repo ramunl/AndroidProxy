@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:name=".LocalProxyApplication"
         android:allowBackup="true"
         android:description="@string/description"
@@ -31,9 +32,10 @@
         <service
             android:name=".proxycore.ProxyService"
             android:exported="true"
-            android:foregroundServiceType="mediaPlayback"
+            android:foregroundServiceType="specialUse"
             android:label="WifiProxyService"
             android:launchMode="singleTop"
+            android:process=":ProxyService"
             android:stopWithTask="false">
             <intent-filter>
                 <action android:name="grgr.localproxy.proxycore.ProxyService" />
